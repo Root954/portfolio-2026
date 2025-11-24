@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Junior MBA - Ingénieur Systèmes Embarqués</title>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom Config for Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#1e293b',
+                            900: '#0f172a',
+                        },
+                        blue: {
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['Fira Code', 'Menlo', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #334155; }
+        .tech-font { font-family: 'Fira Code', monospace; }
+        html { scroll-behavior: smooth; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Animation for modal */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- VISUALIZATION COMPONENTS (Technical Proofs) ---
+
+        // 1. Terminal Simulation for Linux/Driver Projects
+        const TerminalBlock = ({ lines }) => (
+            <div className="bg-slate-900 rounded-lg overflow-hidden border border-slate-700 shadow-xl my-4 font-mono text-xs md:text-sm">
+                <div className="bg-slate-800 px-4 py-2 flex gap-2 border-b border-slate-700">
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                    {/* CUSTOM SIGNATURE HERE */}
+                    <span className="ml-2 text-slate-400 text-xs">jmba@embedded-target:~#</span>
+                </div>
+                <div className="p-4 text-slate-300 space-y-1">
+                    {lines.map((line, idx) => (
+                        <div key={idx} className={`${line.startsWith('>') ? 'text-green-400 font-bold' : ''}`}>
+                            {line.startsWith('>') ? (
+                                <span><span className="text-blue-400">jmba@target:~$</span> {line.substring(1)}</span>
+                            ) : (
+                                line
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+
+        // 2. PID Graph SVG for Control Projects
+        const PidGraph = () => (
+            <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm my-4">
+                <h5 className="text-xs font-bold text-slate-500 uppercase mb-2 text-center">Réponse Échelon - Asservissement PID</h5>
+                <svg viewBox="0 0 400 200" className="w-full h-auto">
+                    <path d="M40,20 L40,180 M120,20 L120,180 M200,20 L200,180 M280,20 L280,180 M360,20 L360,180" stroke="#f1f5f9" strokeWidth="1" />
+                    <path d="M40,180 L380,180 M40,140 L380,140 M40,100 L380,100 M40,60 L380,60 M40,20 L380,20" stroke="#f1f5f9" strokeWidth="1" />
+                    <line x1="40" y1="180" x2="380" y2="180" stroke="#64748b" strokeWidth="2" />
+                    <line x1="40" y1="180" x2="40" y2="20" stroke="#64748b" strokeWidth="2" />
+                    <line x1="40" y1="60" x2="380" y2="60" stroke="#ef4444" strokeWidth="2" strokeDasharray="5,5" />
+                    <text x="385" y="65" fontSize="10" fill="#ef4444">Consigne</text>
+                    <path d="M40,180 C100,180 120,30 160,80 C200,110 240,50 280,65 C320,75 360,60 380,60" fill="none" stroke="#2563eb" strokeWidth="3" />
+                    <text x="200" y="195" fontSize="10" fill="#64748b" textAnchor="middle">Temps (ms)</text>
+                    <text x="30" y="100" fontSize="10" fill="#64748b" textAnchor="middle" transform="rotate(-90, 30, 100)">Position</text>
+                </svg>
+            </div>
+        );
+
+        // 3. Waveform Diagram for FPGA
+        const WaveformDiagram = () => (
+            <div className="bg-slate-900 p-4 rounded-lg border border-slate-700 shadow-sm my-4 font-mono text-xs">
+                 <h5 className="text-xs font-bold text-slate-400 uppercase mb-4 text-center">Simulation ModelSim - Timing VGA</h5>
+                <svg viewBox="0 0 400 150" className="w-full h-auto">
+                    <text x="10" y="35" fill="#94a3b8">CLK</text>
+                    <text x="10" y="75" fill="#94a3b8">HSYNC</text>
+                    <text x="10" y="115" fill="#94a3b8">RGB</text>
+                    <path d="M50,40 h10 v-15 h10 v15 h10 v-15 h10 v15 h10 v-15 h10 v15 h10 v-15 h10 v15 h10 v-15 h10 v15 h10 v-15 h10 v15 h10 v-15 h10 v15 h10 v-15 h10 v15 h10 v-15 h10 v15 h10 v-15 h10 v15 h10 v-15 h10 v15 h10 v-15 h10 v15 h10 v-15 h10" fill="none" stroke="#fbbf24" strokeWidth="1.5" />
+                    <path d="M50,70 h200 v15 h40 v-15 h90" fill="none" stroke="#22d3ee" strokeWidth="2" />
+                    <path d="M50,110 h50 l5,-10 h50 l5,10 h100 l5,-10 h50 l5,10 h60" fill="none" stroke="#a78bfa" strokeWidth="2" />
+                    <line x1="250" y1="20" x2="250" y2="130" stroke="#ef4444" strokeWidth="1" strokeDasharray="3,3" />
+                    <text x="255" y="140" fill="#ef4444" fontSize="10">Sync Pulse</text>
+                </svg>
+            </div>
+        );
+
+        // 4. Architecture Block Diagram
+        const ArchitectureDiagram = () => (
+            <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-sm my-4 flex flex-col items-center">
+                 <h5 className="text-xs font-bold text-slate-500 uppercase mb-4">Architecture Driver Linux</h5>
+                 <div className="flex flex-col gap-2 w-full max-w-sm">
+                    <div className="border-2 border-dashed border-slate-300 rounded p-2 bg-slate-50 text-center">
+                        <span className="text-xs font-bold text-slate-500 block mb-1">USER SPACE</span>
+                        <div className="bg-blue-100 text-blue-800 py-1 px-3 rounded font-mono text-sm border border-blue-200 shadow-sm">Application (C/Python)</div>
+                    </div>
+                    <div className="flex justify-center h-6 relative">
+                        <div className="w-0.5 bg-slate-400 h-full"></div>
+                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-1 text-[10px] text-slate-500">Syscalls (open/ioctl)</div>
+                    </div>
+                    <div className="border-2 border-slate-300 rounded p-3 bg-slate-100 relative">
+                         <span className="text-xs font-bold text-red-500 block mb-2 text-center">KERNEL SPACE</span>
+                         <div className="bg-slate-800 text-white py-2 px-3 rounded font-mono text-sm text-center shadow-md mb-2">
+                             Character Device Driver
+                             <br/><span className="text-[10px] text-slate-400">file_operations / ISR</span>
+                         </div>
+                    </div>
+                    <div className="flex justify-center h-6 relative">
+                        <div className="w-0.5 bg-slate-400 h-full"></div>
+                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-1 text-[10px] text-slate-500">Regs / IRQ</div>
+                    </div>
+                    <div className="bg-green-100 text-green-800 py-2 px-3 rounded font-bold text-sm border border-green-200 shadow-sm text-center w-full">
+                        Hardware (GPIO / Sensor)
+                    </div>
+                 </div>
+            </div>
+        );
+        
+        // --- DATA: PROJECTS ---
+        const projectsData = [
+            {
+                id: 99, 
+                title: "Simulateur de Vol Hélicoptère Gazelle",
+                category: "Projet Académique - Armée de Terre",
+                summary: "Conception et développement d'un simulateur de vol immersif sur cockpit réel pour l'ALAT.",
+                tags: ["Simulation", "Hardware Interface", "C++", "Armée de Terre", "Cockpit"],
+                images: ["IMG_0742.jpg", "IMG_0744.jpg", "IMG_0743.jpg"], 
+                deliverables: [
+                    "Simulateur fonctionnel déployé sur salon",
+                    "Code source C++ d'interfaçage hardware",
+                    "Manuel de procédure de démarrage",
+                    "Documentation technique architecture I/O"
+                ],
+                details: {
+                    context: "Projet réalisé pour l'Armée de Terre et l'école ENSPIMA. Objectif : créer un outil attractif pour les salons de recrutement de l'ALAT.",
+                    objectives: ["Rendre fonctionnel un cockpit de Gazelle", "Assurer l'interface commandes/logiciel", "Créer une expérience immersive"],
+                    architecture: "Cockpit physique instrumenté. PC de simulation haute performance. Écrans panoramiques (DCS/FlightGear) et dalles tactiles avionique.",
+                    tech: ["Simulation Vol", "Interfaçage USB/Série", "Cartes I/O", "Hardware Gazelle", "C++ / Python"],
+                    difficulty: "Récupérer un projet existant et fiabiliser le système hardware/software pour une utilisation intensive.",
+                    result: "Simulateur opérationnel utilisé par l'Armée de Terre.",
+                    proof: "Capacité à travailler sur des systèmes hybrides hardware/software défense."
+                }
+            },
+            {
+                id: 1,
+                title: "Pilotage Machine Industrielle de Précision",
+                category: "Expérience Pro - DWFRITZ",
+                summary: "Développement C++ temps réel pour équipements métrologiques ultra-précis (0.1µm).",
+                tags: ["C++", "Java FX", "PID", "Temps Réel", "Moteurs Linéaires"],
+                visualization: "pid",
+                // Placeholder for future image
+                images: ["dwfritz_project.jpg"],
+                deliverables: [
+                    "Module logiciel de contrôle moteur (C++)",
+                    "Interface IHM de visualisation 3D (JavaFX)",
+                    "Rapport de qualification métrologique",
+                    "Documentation de l'API de pilotage"
+                ],
+                details: {
+                    context: "Apprentissage chez DWFRITZ Metrology. Conception logicielle pour des machines nécessitant une précision nanométrique.",
+                    objectives: ["Contrôler des moteurs linéaires (< 50nm)", "Visualiser les mesures en 3D", "Optimiser l'asservissement PID"],
+                    architecture: "Cœur temps réel en C++ pour le pilotage hardware. IHM JavaFX 3D via IPC. Algorithme PID custom.",
+                    tech: ["C++", "Java FX 3D", "Contrôle PID", "Codeurs Optiques", "Linux"],
+                    difficulty: "Garantir un écart ≤ 50 nm en production, nécessitant une optimisation fine des latences.",
+                    result: "Système déployé en production respectant les contraintes micrométriques.",
+                    proof: "Maîtrise des systèmes complexes à contraintes physiques strictes."
+                }
+            },
+            {
+                id: 4,
+                title: "Driver Linux Char Device & Gestion GPIO",
+                category: "Projet Technique",
+                summary: "Développement d'un module noyau Linux (LKM) pour interfacer un capteur externe via GPIO.",
+                tags: ["C", "Linux Kernel", "Driver", "BeagleBone Black"],
+                visualization: "driver_arch",
+                deliverables: [
+                    "Code source du module noyau (.ko)",
+                    "Application utilisateur de test (C)",
+                    "Documentation d'installation",
+                    "Script de chargement/déchargement"
+                ],
+                details: {
+                    context: "Projet avancé visant à contrôler un hardware spécifique sans passer par sysfs pour la performance.",
+                    objectives: ["Créer un Character Device (/dev/my_sensor)", "Gérer les interruptions hardware", "Implémenter ioctl"],
+                    architecture: "Module noyau chargé dynamiquement. Interaction User/Kernel via file_operations. Interruptions (request_irq) pour les données.",
+                    tech: ["Langage C (Kernel Space)", "Linux 5.x", "Makefiles (Kbuild)", "Hardware: BeagleBone Black"],
+                    difficulty: "Gestion de la concurrence (Race conditions) et synchronisation Interruption/Bottom half.",
+                    result: "Driver fonctionnel, latence réduite de 40% vs User Space.",
+                    proof: "Maîtrise de l'espace noyau et des mécanismes bas niveau Linux."
+                }
+            },
+            {
+                id: 6,
+                title: "Contrôleur VGA sur FPGA",
+                category: "Projet Technique",
+                summary: "Implémentation VHDL d'un contrôleur d'affichage VGA avec générateur de mires et sprites.",
+                tags: ["VHDL", "FPGA", "ModelSim", "Architecture Numérique"],
+                visualization: "waveform",
+                images: ["vga_simulation.jpg"], // Placeholder for future image
+                deliverables: [
+                    "Code source VHDL synthétisable",
+                    "Bancs de test (Testbenches) validés",
+                    "Diagramme FSM",
+                    "Démonstration vidéo sur DE10-Lite"
+                ],
+                details: {
+                    context: "Conception numérique visant à générer des signaux vidéo natifs sans IP propriétaire.",
+                    objectives: ["Générer les signaux de synchro (HSYNC, VSYNC)", "Afficher des motifs géométriques", "Respecter les timings"],
+                    architecture: "FSM pour gérer les timings VGA. Modules séparés pour la synchro et la génération de pixels.",
+                    tech: ["VHDL", "Terasic DE10-Lite (MAX 10)", "Quartus Prime", "ModelSim"],
+                    difficulty: "Gérer le franchissement de domaines d'horloge (CDC) et les contraintes temporelles.",
+                    result: "Affichage stable 640x480 @ 60Hz. Animation fluide.",
+                    proof: "Compétence en description matérielle et timings physiques."
+                }
+            },
+            {
+                id: 2,
+                title: "Système d'Acquisition Environnemental",
+                category: "Expérience Pro - ACMG",
+                summary: "Logiciel embarqué temps réel pour la collecte de données capteurs et validation VHDL.",
+                tags: ["C", "VHDL", "Python", "UART/I2C/SPI", "STM32"],
+                deliverables: ["Firmware STM32 source", "Modèles VHDL", "Scripts Python", "Rapport validation"],
+                details: {
+                    context: "Stage chez ACMG. Développement firmware de collecte de données environnementales.",
+                    objectives: ["Interfacer capteurs multiples", "Valider drivers via simulation", "Traitement temps réel"],
+                    architecture: "Firmware bare-metal/RTOS. Modèles VHDL pour simulation capteurs. Validation Python/Matlab.",
+                    tech: ["C", "VHDL", "Python", "Matlab", "SPI/I2C/UART"],
+                    difficulty: "Intégrité des données asynchrones et corrélation simulation/réel.",
+                    result: "Firmware validé. Debug hardware accéléré.",
+                    proof: "Polyvalence Logiciel / Matériel (Hardware-in-the-loop)."
+                }
+            },
+            {
+                id: 3,
+                title: "Conception Carte Électronique & Prototypage",
+                category: "Expérience Pro - DREAM ÉLECTRONIQUE", // Corrected Name
+                summary: "Conception PCB multicouches sous Altium et validation hardware pour l'aquaculture.",
+                tags: ["Altium Designer", "PCB", "Hardware Debug", "Routage"],
+                deliverables: ["Dossier fabrication PCB", "Schémas Altium", "Carte prototype", "Rapport de tests"],
+                details: {
+                    context: "Stage chez DREAM ÉLECTRONIQUE. Conception cartes pour environnements difficiles.",
+                    objectives: ["Schémas électroniques", "Routage multicouche", "Validation sur banc"],
+                    architecture: "Design Altium. Contraintes impédance et protection environnementale.",
+                    tech: ["Altium Designer", "Oscilloscope", "Soudure", "Multicouche"],
+                    difficulty: "Diagnostic et correction erreurs matérielles prototypes.",
+                    result: "Prototypes fonctionnels livrés.",
+                    proof: "Compétence forte en électronique numérique/analogique."
+                }
+            },
+            {
+                id: 5,
+                title: "Système de Monitoring Temps-Réel sur STM32",
+                category: "Projet Technique",
+                summary: "Acquisition de données capteurs multi-canaux avec FreeRTOS et transmission UART/DMA.",
+                tags: ["C", "STM32", "FreeRTOS", "DMA", "I2C"],
+                deliverables: ["Code source Firmware", "Diagramme RTOS", "Rapport consommation", "Doc protocole"],
+                details: {
+                    context: "Conception nœud capteurs 1kHz sans blocage CPU.",
+                    objectives: ["Acquisition non-bloquante", "Traitement multitâche", "Optimisation énergie"],
+                    architecture: "FreeRTOS. Tâches priorisées. DMA pour transferts.",
+                    tech: ["STM32F4", "FreeRTOS", "STM32CubeIDE", "I2C, UART"],
+                    difficulty: "Debug Stack Overflow et priorités NVIC.",
+                    result: "Système stable 48h. Charge CPU < 15%.",
+                    proof: "Architecture firmware robuste et contrainte."
+                }
+            },
+            {
+                id: 7,
+                title: "Linux Embedded From Scratch (Yocto)",
+                category: "Projet Technique",
+                summary: "Création d'une distribution Linux personnalisée minimale pour une carte i.MX6.",
+                tags: ["Yocto", "Bitbake", "U-Boot", "Python"],
+                visualization: "terminal_boot",
+                deliverables: ["Image bootable", "Layer Yocto", "SDK", "Guide déploiement"],
+                details: {
+                    context: "OS ultra-léger pour système industriel.",
+                    objectives: ["Compiler U-Boot/Kernel", "Recette Yocto custom", "Config Device Tree"],
+                    architecture: "Yocto (Poky). Layer meta-custom. Busybox.",
+                    tech: ["Yocto", "Bitbake", "Device Tree", "Bash"],
+                    difficulty: "Compréhension do_compile et patch Device Tree.",
+                    result: "Image < 50Mo, boot < 5s.",
+                    proof: "Expertise intégration système et outils build."
+                }
+            },
+            {
+                id: 8,
+                title: "Implémentation Filtre Numérique FIR",
+                category: "Projet Technique",
+                summary: "Optimisation d'un algorithme de filtrage passe-bas sur microcontrôleur sans FPU.",
+                tags: ["C", "DSP", "Matlab", "Fixed-Point"],
+                deliverables: ["Code C virgule fixe", "Scripts Matlab", "Benchmark", "Rapport spectral"],
+                details: {
+                    context: "Filtrage bruit signal audio sur MCU low-cost.",
+                    objectives: ["Conception Matlab", "Implémentation C virgule fixe", "Optimisation"],
+                    architecture: "Windowing. Buffer circulaire. Q15 format.",
+                    tech: ["C", "Matlab", "ASM inline"],
+                    difficulty: "Gestion overflow et cycles horloge.",
+                    result: "-40dB atténuation. 3x plus rapide que flottant.",
+                    proof: "Lien mathématiques et contraintes matérielles."
+                }
+            }
+        ];
+
+        // --- COMPONENTS ---
+
+        const Navbar = () => (
+            <nav className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur text-white shadow-lg border-b border-slate-700">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between h-16 items-center">
+                        <div className="flex items-center space-x-2">
+                            <span className="text-blue-500 font-bold text-xl">&lt;Dev/&gt;</span>
+                            <span className="font-bold text-lg tracking-wide">Junior MBA</span>
+                        </div>
+                        <div className="hidden md:flex space-x-8">
+                            <a href="#about" className="hover:text-blue-400 transition-colors text-sm font-medium">À propos</a>
+                            <a href="#skills" className="hover:text-blue-400 transition-colors text-sm font-medium">Compétences</a>
+                            <a href="#projects" className="hover:text-blue-400 transition-colors text-sm font-medium">Projets</a>
+                            <a href="#contact" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-sm font-medium transition-colors">Me Contacter</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        );
+
+        const Hero = () => (
+            <section className="bg-slate-900 text-white pt-20 pb-24 px-4">
+                <div className="max-w-4xl mx-auto text-center">
+                    <div className="inline-block px-3 py-1 mb-6 text-xs font-mono font-semibold tracking-wider text-blue-400 bg-blue-900/30 rounded-full border border-blue-800">
+                        RECHERCHE STAGE FIN D'ÉTUDES (6 MOIS) • FÉV 2026
+                    </div>
+                    <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">
+                        Junior <span className="text-blue-500">MBA</span>
+                    </h1>
+                    <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-slate-200">
+                        Ingénieur Systèmes Embarqués & Électronique
+                    </h2>
+                    <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+                        Étudiant M2 à Evering Bordeaux. Expertise hybride en développement logiciel (Linux/C++/Rust) et conception électronique (FPGA/Altium).
+                    </p>
+                    <div className="flex flex-col sm:flex-row justify-center gap-4">
+                        <a href="#projects" className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition-all shadow-lg shadow-blue-900/50">
+                            Voir mes projets
+                        </a>
+                        <a href="#contact" className="px-8 py-3 bg-transparent border border-slate-600 hover:border-slate-400 text-slate-300 hover:text-white rounded font-medium transition-all flex items-center justify-center gap-2">
+                            Contactez-moi
+                        </a>
+                    </div>
+                </div>
+            </section>
+        );
+
+        const About = () => (
+            <section id="about" className="py-20 bg-white">
+                <div className="max-w-4xl mx-auto px-4">
+                    <h2 className="text-3xl font-bold text-slate-900 mb-8 border-l-4 border-blue-600 pl-4">À Propos</h2>
+                    <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed">
+                        <p className="mb-4">
+                            Actuellement en <strong>Master 2 Systèmes Embarqués à Evering Bordeaux</strong> (ex-IMA), je possède une double compétence matérielle et logicielle acquise au travers d'un parcours riche (ESEO, Université de Bordeaux).
+                        </p>
+                        <p className="mb-4">
+                            J'ai forgé mon expérience sur le terrain : du contrôle de précision nanométrique chez <strong>DWFRITZ</strong> à la conception de cartes électroniques chez <strong>DREAM ÉLECTRONIQUE</strong>, jusqu'au développement temps réel chez <strong>ACMG</strong>.
+                        </p>
+                        <p>
+                            Je maîtrise aussi bien le routage de PCB multicouches que le développement de drivers Linux ou l'implémentation d'algorithmes de contrôle (PID). Je recherche un stage de fin d'études à partir de <strong>Février 2026</strong>.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        );
+
+        const Skills = () => {
+            const skillCategories = [
+                {
+                    title: "Langages",
+                    icon: "code",
+                    skills: ["C / C++ (Avancé)", "Python", "VHDL", "Rust", "Java", "Bash"]
+                },
+                {
+                    title: "Système & OS",
+                    icon: "cpu",
+                    skills: ["Linux Embarqué", "Yocto", "Zephyr", "FreeRTOS", "STM32", "Raspberry Pi"]
+                },
+                {
+                    title: "Électronique & Outils",
+                    icon: "zap",
+                    skills: ["Altium Designer", "KiCad", "Matlab/Simulink", "ROS2", "Git/Jira/VSCode", "Autocad"]
+                },
+                {
+                    title: "Protocoles",
+                    icon: "network",
+                    skills: ["UART, SPI, I2C", "Modbus", "TCP/IP", "Moteurs Linéaires", "Codeurs Optiques"]
+                }
+            ];
+
+            return (
+                <section id="skills" className="py-20 bg-slate-50">
+                    <div className="max-w-6xl mx-auto px-4">
+                        <h2 className="text-3xl font-bold text-slate-900 mb-12 text-center">Compétences Techniques</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                            {skillCategories.map((cat, idx) => (
+                                <div key={idx} className="bg-white p-6 rounded-lg shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                                    <div className="flex items-center gap-3 mb-4 text-blue-600">
+                                        <h3 className="font-bold text-lg text-slate-800">{cat.title}</h3>
+                                    </div>
+                                    <ul className="space-y-2">
+                                        {cat.skills.map((skill, sIdx) => (
+                                            <li key={sIdx} className="text-slate-600 text-sm flex items-center">
+                                                <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2"></span>
+                                                {skill}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const ProjectModal = ({ project, onClose }) => {
+            if (!project) return null;
+            
+            const handleBackdropClick = (e) => {
+                if (e.target === e.currentTarget) onClose();
+            };
+
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={handleBackdropClick}>
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto animate-fade-in">
+                        <div className="sticky top-0 bg-white border-b border-slate-100 p-6 flex justify-between items-center z-10">
+                            <div>
+                                <h3 className="text-2xl font-bold text-slate-900">{project.title}</h3>
+                                <span className="text-sm font-mono text-blue-600 font-semibold">{project.category}</span>
+                            </div>
+                            <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-500">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                        </div>
+                        
+                        <div className="p-6 space-y-8">
+                            
+                            {/* Gallery Section - Only if images exist */}
+                            {project.images && project.images.length > 0 && (
+                                <div>
+                                    <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                                        <span className="w-1 h-4 bg-purple-500 rounded-full"></span> Illustrations
+                                    </h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {project.images.map((img, idx) => (
+                                            <img 
+                                                key={idx} 
+                                                src={img} 
+                                                alt={`Projet illustration ${idx+1}`} 
+                                                className={`rounded-lg shadow-md object-cover w-full ${idx === 0 ? 'md:col-span-2 h-64 md:h-80' : 'h-48'}`}
+                                                onError={(e) => {e.target.style.display='none'}}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* --- DYNAMIC PROOF VISUALIZATIONS --- */}
+                            
+                            {/* Visualization: Driver Architecture & Terminal */}
+                            {project.visualization === 'driver_arch' && (
+                                <div>
+                                     <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                                        <span className="w-1 h-4 bg-blue-500 rounded-full"></span> Architecture & Preuve Fonctionnelle
+                                    </h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <ArchitectureDiagram />
+                                        <TerminalBlock lines={[
+                                            "> insmod my_sensor_driver.ko",
+                                            "[ 145.2394] my_sensor: Module loaded successfully",
+                                            "[ 145.2412] my_sensor: Major device number 240 allocated",
+                                            "[ 145.2428] my_sensor: GPIO 48 configured as IRQ",
+                                            "> cat /dev/my_sensor",
+                                            "Sensor Value: 0x4A2F (19.4 C)",
+                                            "> dmesg | tail -n 2",
+                                            "[ 160.1102] my_sensor: IRQ handled, buffer updated",
+                                            "[ 160.1125] my_sensor: Read operation completed"
+                                        ]} />
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {/* Visualization: Yocto Boot */}
+                            {project.visualization === 'terminal_boot' && (
+                                <div>
+                                     <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                                        <span className="w-1 h-4 bg-blue-500 rounded-full"></span> Log de Démarrage (Bootlog)
+                                    </h4>
+                                    <TerminalBlock lines={[
+                                        "U-Boot 2022.04 (Feb 15 2024 - 14:22:10 +0000)",
+                                        "CPU:   Freescale i.MX6 Solo/DualLite rev1.3 at 792 MHz",
+                                        "DRAM:  512 MiB",
+                                        "MMC:   FSL_SDHC: 0, FSL_SDHC: 1",
+                                        "Loading Kernel Image...",
+                                        "Starting kernel ...",
+                                        "[    0.000000] Booting Linux on physical CPU 0x0",
+                                        "[    0.412000] Yocto Project Reference Distro 4.0",
+                                        "[    1.250000] Freeing unused kernel memory: 1024K",
+                                        "INIT: version 2.88 booting",
+                                        "Starting junior-app-daemon... OK",
+                                        "",
+                                        "Poky (Yocto Project Reference Distro) 4.0 imx6qttymxc0",
+                                        "junio-custom-board login: root",
+                                        "root@imx6:~# _"
+                                    ]} />
+                                </div>
+                            )}
+
+                            {/* Visualization: PID Graph */}
+                            {project.visualization === 'pid' && (
+                                <div>
+                                     <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                                        <span className="w-1 h-4 bg-red-500 rounded-full"></span> Performance Asservissement
+                                    </h4>
+                                    <PidGraph />
+                                </div>
+                            )}
+
+                            {/* Visualization: FPGA Waveform */}
+                            {project.visualization === 'waveform' && (
+                                <div>
+                                     <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                                        <span className="w-1 h-4 bg-yellow-500 rounded-full"></span> Simulation Timing (RTL)
+                                    </h4>
+                                    <WaveformDiagram />
+                                </div>
+                            )}
+
+                            {/* --- STANDARD DETAILS --- */}
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                                    <h4 className="font-semibold text-slate-900 mb-2 flex items-center gap-2">
+                                        <span className="w-1 h-4 bg-blue-500 rounded-full"></span> Contexte & Objectifs
+                                    </h4>
+                                    <p className="text-sm text-slate-600 mb-2">{project.details.context}</p>
+                                    <ul className="list-disc list-inside text-sm text-slate-600 space-y-1">
+                                        {project.details.objectives.map((obj, i) => <li key={i}>{obj}</li>)}
+                                    </ul>
+                                </div>
+                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                                    <h4 className="font-semibold text-slate-900 mb-2 flex items-center gap-2">
+                                        <span className="w-1 h-4 bg-green-500 rounded-full"></span> Stack Technique
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {project.details.tech.map((t, i) => (
+                                            <span key={i} className="px-2 py-1 bg-white border border-slate-200 text-xs font-mono text-slate-700 rounded shadow-sm">
+                                                {t}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {/* Deliverables Section */}
+                            {project.deliverables && project.deliverables.length > 0 && (
+                                <div className="bg-blue-50 border border-blue-100 p-5 rounded-lg">
+                                    <h4 className="font-bold text-slate-900 mb-3 flex items-center gap-2">
+                                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                                        Livrables Clés
+                                    </h4>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                                        {project.deliverables.map((item, idx) => (
+                                            <div key={idx} className="flex items-start gap-2 text-sm text-slate-700">
+                                                <svg className="w-4 h-4 text-green-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                                                <span>{item}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            <div>
+                                <h4 className="font-bold text-slate-900 mb-3 border-b pb-2">Architecture & Défis</h4>
+                                <p className="text-slate-700 leading-relaxed mb-4">{project.details.architecture}</p>
+                                <div className="bg-amber-50 border-l-4 border-amber-400 p-4">
+                                    <p className="text-sm text-amber-900"><strong>Challenge :</strong> {project.details.difficulty}</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4 className="font-bold text-slate-900 mb-3 border-b pb-2">Résultats & Acquis</h4>
+                                <p className="text-slate-700 mb-2">{project.details.result}</p>
+                                <p className="text-sm font-semibold text-blue-700">Expertise démontrée : {project.details.proof}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Projects = () => {
+            const [selectedProject, setSelectedProject] = useState(null);
+
+            const getGradient = (id) => {
+                const gradients = [
+                    "bg-gradient-to-br from-slate-700 to-slate-800",
+                    "bg-gradient-to-br from-blue-800 to-slate-900",
+                    "bg-gradient-to-br from-indigo-900 to-slate-800",
+                    "bg-gradient-to-br from-slate-600 to-slate-700",
+                ];
+                return gradients[id % gradients.length];
+            };
+
+            return (
+                <section id="projects" className="py-24 bg-white scroll-mt-16">
+                    <div className="max-w-6xl mx-auto px-4">
+                        <div className="text-center mb-16">
+                            <h2 className="text-3xl font-bold text-slate-900 mb-4">Expériences & Projets</h2>
+                            <p className="text-slate-500 max-w-2xl mx-auto">
+                                Un parcours jalonné de réalisations concrètes en entreprise et projets académiques avancés.
+                            </p>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {projectsData.map(project => (
+                                <div key={project.id} className="group flex flex-col bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-xl hover:border-blue-200 transition-all duration-300 h-full">
+                                    
+                                    <div className="h-48 overflow-hidden relative bg-slate-100">
+                                        {project.images && project.images.length > 0 ? (
+                                            <img 
+                                                src={project.images[0]} 
+                                                alt={project.title} 
+                                                className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                                                onError={(e) => {
+                                                    e.target.style.display = 'none';
+                                                    e.target.nextSibling.style.display = 'flex'; // Show fallback
+                                                }}
+                                            />
+                                        ) : (
+                                           <div className={`w-full h-full ${getGradient(project.id)} flex items-center justify-center`}>
+                                                <span className="text-white/20 font-mono text-4xl font-bold">&lt;/&gt;</span>
+                                           </div> 
+                                        )}
+                                        {/* Fallback hidden by default, shown by onError */}
+                                        <div className={`w-full h-full ${getGradient(project.id)} items-center justify-center hidden absolute top-0 left-0`}>
+                                                <span className="text-white/20 font-mono text-4xl font-bold">&lt;/&gt;</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-6 flex-1 flex flex-col">
+                                        <div className="mb-4">
+                                            <span className={`text-xs font-mono font-bold uppercase tracking-wider px-2 py-1 rounded ${project.category.includes('Armée') ? 'bg-green-100 text-green-800' : project.category.includes('Pro') ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-600'}`}>
+                                                {project.category}
+                                            </span>
+                                        </div>
+                                        <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-blue-700 transition-colors">
+                                            {project.title}
+                                        </h3>
+                                        <p className="text-slate-600 text-sm mb-6 flex-1">
+                                            {project.summary}
+                                        </p>
+                                        <div className="flex flex-wrap gap-2 mb-6">
+                                            {project.tags.slice(0,3).map((tag, i) => (
+                                                <span key={i} className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">
+                                                    #{tag}
+                                                </span>
+                                            ))}
+                                            {project.tags.length > 3 && <span className="text-xs text-slate-400 px-1">...</span>}
+                                        </div>
+                                        <button 
+                                            onClick={() => setSelectedProject(project)}
+                                            className="w-full mt-auto py-2 border border-slate-300 rounded text-sm font-medium text-slate-700 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
+                                        >
+                                            Voir Détails & Preuves
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    
+                    {selectedProject && (
+                        <ProjectModal 
+                            project={selectedProject} 
+                            onClose={() => setSelectedProject(null)} 
+                        />
+                    )}
+                </section>
+            );
+        };
+
+        const Contact = () => (
+            <section id="contact" className="py-20 bg-slate-900 text-white">
+                <div className="max-w-4xl mx-auto px-4 text-center">
+                    <h2 className="text-3xl font-bold mb-8">Discutons de votre prochain projet</h2>
+                    <p className="text-slate-300 mb-10 max-w-xl mx-auto">
+                        Disponible dès février 2026 pour un stage de 6 mois. Mobile géographiquement.
+                    </p>
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+                        <a href="mailto:juniormba.pro@hotmail.com" className="flex items-center gap-3 px-6 py-4 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors w-full md:w-auto justify-center">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            juniormba.pro@hotmail.com
+                        </a>
+                        <div className="flex items-center gap-3 px-6 py-4 bg-slate-800 rounded-lg font-medium border border-slate-700 w-full md:w-auto justify-center text-slate-300">
+                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                            +33 6 50 58 14 27
+                        </div>
+                        <a href="#" className="flex items-center gap-3 px-6 py-4 bg-slate-800 hover:bg-slate-700 rounded-lg font-medium transition-colors border border-slate-700 w-full md:w-auto justify-center">
+                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                            LinkedIn
+                        </a>
+                    </div>
+                    <footer className="mt-20 pt-8 border-t border-slate-800 text-slate-500 text-sm">
+                        <p>© 2024 Junior MBA. Portfolio Ingénieur.</p>
+                    </footer>
+                </div>
+            </section>
+        );
+
+        const App = () => {
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }, []);
+
+            return (
+                <div className="min-h-screen">
+                    <Navbar />
+                    <Hero />
+                    <About />
+                    <Skills />
+                    <Projects />
+                    <Contact />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
